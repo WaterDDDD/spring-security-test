@@ -1,8 +1,11 @@
 package com.kai.springsecuritytest.dao.impl;
 
+
 import com.kai.springsecuritytest.dao.MemberDao;
 import com.kai.springsecuritytest.model.Member;
+import com.kai.springsecuritytest.model.Role;
 import com.kai.springsecuritytest.rowmapper.MemberRowMapper;
+import com.kai.springsecuritytest.rowmapper.RoleRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,18 +21,22 @@ import java.util.Map;
 @Component
 public class MemberDaoImpl implements MemberDao {
 
+
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
     private MemberRowMapper memberRowMapper;
 
+    @Autowired
+    private RoleRowMapper roleRowMapper;
+
     @Override
     public Member getMemberById(Integer memberId) {
 
-        String sql = "SELECT member_id, email, password, name, age FROM member WHERE member_id = memberId ";
+        String sql = "SELECT email, password, name, age FROM member WHERE member_id = :memberId";
 
-        Map<String ,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("memberId", memberId);
 
         List<Member> memberList = namedParameterJdbcTemplate.query(sql, map, memberRowMapper);
@@ -45,7 +52,7 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public Member gerMemberByEmail(String email) {
 
-        String sql = " SELECT member_id, email, password, name, age FROM member WHERE email = email";
+        String sql = "SELECT member_id, email, password, name, age FROM member WHERE email = :email";
 
         Map<String, Object> map = new HashMap<>();
         map.put("email", email);
@@ -55,7 +62,7 @@ public class MemberDaoImpl implements MemberDao {
         if (memberList.size() > 0) {
             return memberList.get(0);
         } else {
-            return  null;
+            return null;
         }
 
     }
@@ -63,7 +70,7 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public Integer createMember(Member member) {
 
-        String sql = "INSERT INTO member(email, password, name, age) VALUES (:email, :password, :name, :age)";
+        String sql = "INSERT INTO member(email, password, name, age) VALUES(:email, :password, :name, :age)";
 
         Map<String, Object> map = new HashMap<>();
         map.put("email", member.getEmail());
@@ -79,5 +86,21 @@ public class MemberDaoImpl implements MemberDao {
 
         return memberId;
 
+    }
+
+    @Override
+    public List<Role> getRolesByMemberId(Integer memberId) {
+        String sql = """
+                        SELECT role.role_id, role.role_name FROM role    
+                        JOIN member_has_role ON member_has_role.role_id = role.role_id
+                        WHERE member_has_role.member_id = :memberId
+                """;
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("memberId", memberId);
+
+        List<Role> roleList = namedParameterJdbcTemplate.query(sql, map, roleRowMapper);
+
+        return roleList;
     }
 }

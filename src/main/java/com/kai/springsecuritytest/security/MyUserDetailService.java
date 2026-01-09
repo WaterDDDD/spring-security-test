@@ -2,8 +2,10 @@ package com.kai.springsecuritytest.security;
 
 import com.kai.springsecuritytest.dao.MemberDao;
 import com.kai.springsecuritytest.model.Member;
+import com.kai.springsecuritytest.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,10 +35,24 @@ public class MyUserDetailService implements UserDetailsService {
             String memberEmail = member.getEmail();
             String memberPassword = member.getPassword();
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
+            List<Role> roleList = memberDao.getRolesByMemberId(member.getMemberId());
+
+            List<GrantedAuthority> authorities = convertToAuthorities(roleList);
 
             return new User(memberEmail, memberPassword, authorities);
 
         }
     }
+
+    private List<GrantedAuthority> convertToAuthorities(List<Role> roleList) {
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        for (Role role : roleList) {
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+        }
+
+        return  authorities;
+    }
+
 }
