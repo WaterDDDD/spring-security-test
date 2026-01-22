@@ -14,4 +14,10 @@ public interface MemberDao {
     Integer createMember(Member member);
 
     List<Role> getRolesByMemberId(Integer memberId);
+
+    void addRoleByMemberId(Integer memberId, Role role);
+
+    void removeRoleFromMemberId(Integer memberId, Role role);
+
+    Role getRoleByRoleName(String roleName);
 }

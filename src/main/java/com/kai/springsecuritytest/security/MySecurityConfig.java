@@ -37,8 +37,7 @@ public class MySecurityConfig {
 
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/register").permitAll()
-                        .requestMatchers("/hello").hasRole("ADMIN")
-                        .requestMatchers("/test").hasRole("VIP_MEMBER")
+                        .requestMatchers("/vipMovie").hasRole("VIP_MEMBER")
                         .anyRequest().authenticated()
                 )
 

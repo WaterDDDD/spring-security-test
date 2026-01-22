@@ -103,4 +103,47 @@ public class MemberDaoImpl implements MemberDao {
 
         return roleList;
     }
+
+    @Override
+    public void addRoleByMemberId(Integer memberId, Role role) {
+
+        String sql = "INSERT INTO member_has_role(member_id, role_id) VALUES (:memberId, :roleId)";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("memberId", memberId);
+        map.put("roleIde", role.getRoleId());
+
+        namedParameterJdbcTemplate.update(sql, map);
+
+    }
+
+    @Override
+    public void removeRoleFromMemberId(Integer memberId, Role role) {
+
+        String sql = "DELETE FROM member_has_role WHERE member_id = :memberId AND role_id = :roleId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("memberId", memberId);
+        map.put("roleIde", role.getRoleId());
+
+        namedParameterJdbcTemplate.update(sql, map);
+
+    }
+
+    @Override
+    public Role getRoleByRoleName(String roleName) {
+
+        String sql = "SELECT role_name FROM role WHERE role_name = :roleName";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("roleName", roleName);
+
+        List<Role> roleList = namedParameterJdbcTemplate.query(sql, map, roleRowMapper);
+
+        if (roleList.isEmpty()) {
+            return null;
+        } else {
+            return roleList.get(0);
+        }
+    }
 }
