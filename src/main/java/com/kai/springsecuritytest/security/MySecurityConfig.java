@@ -41,10 +41,11 @@ public class MySecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/login", "/register")
                 )
 
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/register", "login").permitAll()
                         .requestMatchers("/vipMovie").hasRole("VIP_MEMBER")
                         .anyRequest().authenticated()
                 )
